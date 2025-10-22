@@ -7,6 +7,8 @@ public class RestaurantSearchCriteria {
     private Double price;
     private String cuisine;
 
+    public RestaurantSearchCriteria() {}
+
     public RestaurantSearchCriteria(String name, Double rating, Double distance, Double price, String cuisine) {
         this.name = name;
         this.rating = rating;

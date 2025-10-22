@@ -1,23 +1,35 @@
 package org.restaurantsearch.service.search;
 
 import org.restaurantsearch.dto.RestaurantResponse;
+import org.restaurantsearch.model.Cuisine;
 import org.restaurantsearch.model.Restaurant;
+import org.restaurantsearch.service.loader.CuisineCsvLoader;
+import org.restaurantsearch.service.loader.RestaurantCsvLoader;
 import org.restaurantsearch.util.RestaurantSearchValidator;
+import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+@Component
 public class RestaurantSearchService {
 
+    private final CuisineCsvLoader cuisineCsvLoader;
+    private final Map<String, Cuisine> cuisineMap;
+    private final RestaurantCsvLoader restaurantCsvLoader;
     private final List<Restaurant> restaurants;
 
-    public RestaurantSearchService(List<Restaurant> restaurants) {
-        this.restaurants = restaurants;
+    public RestaurantSearchService() {
+        this.cuisineCsvLoader = new CuisineCsvLoader();
+        this.cuisineMap = cuisineCsvLoader.loadCuisineMap();
+        this.restaurantCsvLoader = new RestaurantCsvLoader(cuisineMap);
+        this.restaurants = restaurantCsvLoader.loadRestaurants();
     }
 
-    public List<RestaurantResponse> search(RestaurantSearchCriteria searchCriteria) {
+    public List<RestaurantResponse> search(RestaurantSearchCriteria searchCriteria) throws IllegalArgumentException {
         RestaurantSearchValidator.validateSearchCriteria(searchCriteria);
 
         return restaurants.stream()

@@ -1,6 +1,7 @@
 package org.restaurantsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.restaurantsearch.cli.RestaurantSearchCLI;
 import org.restaurantsearch.dto.RestaurantResponse;
 import org.restaurantsearch.model.Cuisine;
 import org.restaurantsearch.model.Restaurant;
@@ -18,39 +19,18 @@ import java.util.Map;
 @SpringBootApplication
 public class App implements CommandLineRunner {
 
+    private final RestaurantSearchCLI cli;
+
+    public App(RestaurantSearchCLI cli) {
+        this.cli = cli;
+    }
+
     public static void main(String[] args) {
         SpringApplication.run(App.class, args);
     }
 
-
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("=== Starting Restaurant Search CLI ===");
-
-
-        CuisineCsvLoader cuisineCsvLoader = new CuisineCsvLoader();
-        Map<String, Cuisine> cuisineMap = cuisineCsvLoader.loadCuisineMap();
-
-        RestaurantCsvLoader restaurantCsvLoader = new RestaurantCsvLoader(cuisineMap);
-        List<Restaurant> restaurants = restaurantCsvLoader.loadRestaurants();
-
-        RestaurantSearchService restaurantSearchService = new RestaurantSearchService(restaurants);
-        List<RestaurantResponse> filteredList = restaurantSearchService.search(new RestaurantSearchCriteria("deli", null, null, null, null));
-
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writerWithDefaultPrettyPrinter()
-                .writeValueAsString(filteredList);
-        System.out.println(json);
-
-        // Search example
-        /*
-        var results = searchService.search("Mcd", 3, null, null, null);
-        results.forEach(r ->
-                System.out.printf("%s | Rating: %d | Distance: %.1f | Price: %.2f | Cuisine: %s%n",
-                        r.getName(), r.getCustomerRating(), r.getDistance(), r.getPrice(), r.getCuisine().getName())
-        );
-        */
-
-        System.out.println("=== CLI Execution Finished ===");
+        cli.start();
     }
 }
