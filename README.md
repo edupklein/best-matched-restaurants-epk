@@ -1,37 +1,97 @@
 # Best Matched Restaurants Search Engine
 
-This is ...
-
 ## Focus of this project
 
 - Java Project using Spring Boot to facilitate packaging and running in standalone mode.
 - Added 2 types of execution:
-  - CLI (default)
-  - API
+    - API (default)
+    - CLI 
 - This project has no UI
 - The response of the search is returned formatted as a JSON
 
 ## Usage
+First, you need to decide what type of execution you want to run. Below is the description of how to run in both modes (API or CLI):
 
-1. Clone the repository (remove):
+### Run in CLI mode:
+1. In the same directory as the JAR file:
     ```bash
-    git clone https://github.com/edupklein/best-matched-restaurants-epk.git
+    java -jar best-matched-restaurants-epk.jar --cli --spring.main.web-application-type=none
+    ```
+2. This will start the application in CLI mode. After it's running, you just have to follow the questions that will show in the terminal regarding the parameters of the search.
+   1. You can skip any parameters by pressing ENTER
+   2. Only parameters that are informed are used in the search
+   3. If you inform any invalid parameter, it'll show an Error message and ask if you want to do another search
+3. The result of the search is exhibited formatted as JSON in the terminal
+4. After the execution, the program will ask if you want to do another search
+
+### Run in API mode:
+1. In the same directory as the JAR file:
+    ```bash
+    java -jar best-matched-restaurants-epk.jar
+    ```
+2. This will start the application in API mode (port 8080). After it's running, you can send requests to http://localhost:8080/api/restaurants/search using curl command or a API Request Client (like Bruno or Postman). Here's an example below:
+    ```bash
+    curl --request GET \
+    --url http://localhost:8080/api/restaurants/search \
+    --header 'content-type: application/json' \
+    --data '{
+    "name": "deli",
+    "rating": 3,
+    "distance": 2,
+    "price": 30,
+    "cuisine": "Chinese"
+    }'
+    ```
+3. The search parameters are handed over through the body of the request, formatted as JSON. You can specify all search parameters in the body, or choose which parameter you want to send. Here are a few examples different body parameters:
+     ```bash
+    {
+    "name": "deli",
+    "rating": 3,
+    "distance": 2,
+    "price": 30,
+    "cuisine": "Chinese"
+    }
+    ```
+    ```bash
+   {
+   "name": "deli",
+   "rating": 3
+   }
+    ```
+4. If you need to kill the Spring application process running in port 8080, you can run the following command (be careful as this will kill all processes running in 8080):
+
+    MacOS / Linux: 
+   ```bash
+    lsof -t -i:8080 | xargs kill -9
+    ```
+    Windows: 
+   ```bash
+    netstat -ano | findstr :8080
+    ```
+    ```bash
+    taskkill /PID 12345 /F
     ```
 
 ## Assumptions
 
 - Searches of names of restaurants and cuisines are case-insensitive
-- If the name or rating is invalid in the csv, it will still show in the resulted search (this doesn't applied because the csv contains only correct values)
-- If the user gives an invalid parameter (e.g. Rating < 1 or Rating > 5) it will show an ERROR message, but still ask if the user wants to make another search
-- All search results will return all the values / columns from the Restaurant (Name, Customer Rating, Distance, Price, Cuisine Name)
+- If the name or rating is invalid in the csv, it will still show in the resulted search (this doesn't apply because the csv contains only correct values)
+- (CLI) If the user gives an invalid parameter (e.g. Rating < 1 or Rating > 5) it will show an ERROR message, but still ask if the user wants to make another search
+- All search results will return all the values / columns from the Restaurant (Name, Customer Rating, Distance, Price, Cuisine Name) formatted as a JSON
 
 ## Technical Explanation of the Application
 
 Steps:
-1. All Restaurants and Cuisines are loaded from CSV files (CuisineCsvLoader / RestaurantCsvLoader & RestaurantConverter)
-2. 
-
-The core of the Restaurant Search Engine is inside the RestaurantSearchService class (inside 'search' method).
+1. Entry point:
+   1. If you run in CLI mode, the entry point is the `RestaurantSearchCLI` class.
+      1. For CLI execution, the `RestaurantSearchCriteria` object will be instantiated during execution after the program asks the inputs from the user.
+   2. If you run in API mode, the entry point is the `RestaurantSearchController` class, through the endpoint `api/restaurants/search`
+      1. For API execution, the `RestaurantSearchCriteria` object will be received from the body of the request, that is handed as a JSON.
+2. Both entry points call the search engine `RestaurantSearchService` passing the `RestaurantSearchCriteria` as the user input.
+3. All Restaurants and Cuisines are loaded from CSV files (`CuisineCsvLoader` / `RestaurantCsvLoader` & `RestaurantConverter`) as dependencies inside `RestaurantSearchService`
+4. The Restaurants are all loaded as objects of the `Restaurant` class in a `List<Restaurant>` inside the `RestaurantSearchService`
+5. The `RestaurantSearchService` call the validation of inputs through `RestaurantSearchValidator` and after that, it does all the search filters and sorting using the predefined rules (using Collections framework in Java).
+6. The returned list of `Restaurant` that fall into the search is converted into a list of `RestaurantResponse` for better visualizing in JSON format. 
 
 ## Usability Explanation of the Application
 

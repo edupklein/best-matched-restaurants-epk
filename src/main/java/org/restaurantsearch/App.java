@@ -31,6 +31,18 @@ public class App implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        cli.start();
+        boolean cliMode = false;
+        for (String arg : args) {
+            if (arg.equalsIgnoreCase("--cli")) {
+                cliMode = true;
+                break;
+            }
+        }
+
+        if (cliMode) {
+            cli.start();
+        } else {
+            System.out.println("API mode active — listening on port 8080...");
+        }
     }
 }

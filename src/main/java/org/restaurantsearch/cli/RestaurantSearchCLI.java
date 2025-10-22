@@ -50,7 +50,7 @@ public class RestaurantSearchCLI {
             criteria.setCuisine(cuisine.isBlank() ? null : cuisine);
 
             // Fetch all results from search service
-            List<RestaurantResponse> results;
+            List<RestaurantResponse> results = new ArrayList<>();
             try{
                 results = searchService.search(criteria);
             }catch (IllegalArgumentException e) {
@@ -64,7 +64,11 @@ public class RestaurantSearchCLI {
             }
 
             // Show to the user the results formatted as JSON
-            System.out.println("\nResults: ");
+            if(!results.isEmpty()) {
+                System.out.println("\nResults: ");
+            }else{
+                System.out.println("\nNo results found.");
+            }
             try {
                 String json = new ObjectMapper()
                         .writerWithDefaultPrettyPrinter()
