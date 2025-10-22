@@ -1,7 +1,11 @@
 package org.restaurantsearch;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.restaurantsearch.dto.RestaurantResponse;
 import org.restaurantsearch.model.Cuisine;
 import org.restaurantsearch.model.Restaurant;
+import org.restaurantsearch.service.search.RestaurantSearchCriteria;
+import org.restaurantsearch.service.search.RestaurantSearchService;
 import org.restaurantsearch.service.loader.CuisineCsvLoader;
 import org.restaurantsearch.service.loader.RestaurantCsvLoader;
 import org.springframework.boot.CommandLineRunner;
@@ -30,7 +34,13 @@ public class App implements CommandLineRunner {
         RestaurantCsvLoader restaurantCsvLoader = new RestaurantCsvLoader(cuisineMap);
         List<Restaurant> restaurants = restaurantCsvLoader.loadRestaurants();
 
-        restaurants.forEach(System.out::println);
+        RestaurantSearchService restaurantSearchService = new RestaurantSearchService(restaurants);
+        List<RestaurantResponse> filteredList = restaurantSearchService.search(new RestaurantSearchCriteria("deli", null, null, null, null));
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writerWithDefaultPrettyPrinter()
+                .writeValueAsString(filteredList);
+        System.out.println(json);
 
         // Search example
         /*
