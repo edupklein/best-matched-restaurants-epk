@@ -75,7 +75,7 @@ First, you need to decide what type of execution you want to run. Below is the d
 ## Assumptions
 
 - Searches of names of restaurants and cuisines are case-insensitive
-- If the name or rating is invalid in the csv, it will still show in the resulted search (this doesn't apply because the csv contains only correct values)
+- If any parameter is invalid in the csv, the restaurant record will still show in the resulted search (this doesn't apply because the csv contains only correct values)
 - (CLI) If the user gives an invalid parameter (e.g. Rating < 1 or Rating > 5) it will show an ERROR message, but still ask if the user wants to make another search
 - All search results will return all the values / columns from the Restaurant (Name, Customer Rating, Distance, Price, Cuisine Name) formatted as a JSON
 
